@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Controle de Sequestro BOPE</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="app.js"></script>
+
+  <!-- Login/Register/Reset Modal -->
+  <div id="auth-container" class="auth-container">
+    <div id="login-form" class="auth-form">
+      <h2>Login</h2>
+      <input type="email" id="login-email" placeholder="E-mail" required />
+      <input type="password" id="login-password" placeholder="Senha" required />
+      <button id="login-btn">Entrar</button>
+      <p><a href="#" id="show-reset">Esqueci minha senha</a></p>
+      <p>Não tem conta? <a href="#" id="show-register">Registrar-se</a></p>
+    </div>
+    <div id="register-form" class="auth-form" style="display:none;">
+      <h2>Registrar-se</h2>
+      <input type="text" id="register-name" placeholder="Nome completo" required />
+      <input type="email" id="register-email" placeholder="E-mail" required />
+      <input type="password" id="register-password" placeholder="Senha" required />
+      <button id="register-btn">Registrar</button>
+      <p>Já tem conta? <a href="#" id="show-login">Entrar</a></p>
+    </div>
+    <div id="reset-form" class="auth-form" style="display:none;">
+      <h2>Recuperar Senha</h2>
+      <input type="email" id="reset-email" placeholder="E-mail" required />
+      <button id="reset-btn">Enviar link de recuperação</button>
+      <p>Lembrou a senha? <a href="#" id="show-login2">Entrar</a></p>
+    </div>
+  </div>
+  <!-- Fim Auth -->
+
+  <!-- Painel de Aprovação de Usuários (Admin) -->
+  <div id="admin-approval-panel" class="admin-panel" style="display:none;">
+    <h2>Usuários Pendentes</h2>
+    <table id="pending-users-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Data de Cadastro</th>
+          <th>Ações</th>
+          <th>Admin</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Usuários pendentes serão inseridos aqui via JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Tela Inicial Pós-Login -->
+  <div id="main-home" class="main-home" style="display:none;">
+    <div class="home-content">
+      <img src="https://cdn.prod.website-files.com/60ff690cd7b0537edb99a29a/67e1766eaa2556bf2bf03217_BOPE%20RJ.jpg" alt="Painel Ilustrativo" class="home-hero-img" />
+      <h1>Bem-vindo ao Painel</h1>
+      <div class="home-options">
+        <button id="btn-cadastrar-sequestros" class="home-btn">Cadastrar Sequestros</button>
+        <button id="btn-cadastrar-acoes" class="home-btn">Cadastrar Ações Marcadas</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulário de Cadastrar Sequestros -->
+  <div id="form-sequestro" class="form-cadastro" style="display:none;">
+    <h2>Cadastrar Sequestro</h2>
+    <input type="text" id="seq-vitimado" placeholder="Nome da vítima" required />
+    <input type="text" id="seq-local" placeholder="Local do sequestro" required />
+    <input type="datetime-local" id="seq-data" required />
+    <textarea id="seq-detalhes" placeholder="Detalhes" rows="3"></textarea>
+    <div class="form-actions">
+      <button id="btn-salvar-sequestro" class="form-btn">Salvar</button>
+      <button id="btn-voltar-sequestro" class="form-btn form-btn-secondary">Voltar</button>
+    </div>
+  </div>
+
+  <!-- Formulário de Cadastrar Ações Marcadas -->
+  <div id="form-acao" class="form-cadastro" style="display:none;">
+    <h2>Cadastrar Ação Marcada</h2>
+    <input type="text" id="acao-titulo" placeholder="Título da ação" required />
+    <input type="text" id="acao-responsavel" placeholder="Responsável" required />
+    <input type="date" id="acao-data" required />
+    <textarea id="acao-detalhes" placeholder="Detalhes" rows="3"></textarea>
+    <div class="form-actions">
+      <button id="btn-salvar-acao" class="form-btn">Salvar</button>
+      <button id="btn-voltar-acao" class="form-btn form-btn-secondary">Voltar</button>
+    </div>
+  </div>
+
+  <!-- Navegação dos painéis -->
+  <div class="painel-nav" style="display:none;" id="painel-nav">
+    <button id="btn-painel-geral" class="painel-btn">Painel Geral</button>
+    <button id="btn-painel-usuarios" class="painel-btn">Resultados por Usuário</button>
+    <button id="btn-painel-gestor" class="painel-btn" style="display:none;">Painel Gestor</button>
+  </div>
+
+  <!-- Painel Geral (com gráficos) -->
+  <div id="painel-geral" class="painel-box" style="display:none;">
+    <h2>Painel Geral</h2>
+    <div class="graficos-box">
+      <div>
+        <h3>Gráfico Geral de Ações por Dia</h3>
+        <canvas id="grafico-geral"></canvas>
+      </div>
+      <div>
+        <h3>Gráfico Individual por Usuário</h3>
+        <canvas id="grafico-individual"></canvas>
+      </div>
+      <div>
+        <h3>Sequestros por Dia</h3>
+        <canvas id="grafico-sequestros"></canvas>
+      </div>
+      <div>
+        <h3>Ações Marcadas por Dia</h3>
+        <canvas id="grafico-acoes"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Painel de Resultados por Usuário -->
+  <div id="painel-usuarios" class="painel-box" style="display:none;">
+    <h2>Resultados por Usuário</h2>
+    <div class="painel-filtros">
+      <label for="filtro-mes">Período:</label>
+      <select id="filtro-mes"></select>
+      <button id="btn-exportar-csv" class="painel-btn painel-btn-export">Exportar CSV</button>
+      <button id="btn-exportar-pdf" class="painel-btn painel-btn-export">Exportar PDF</button>
+      <button id="btn-definir-metas" class="painel-btn" style="display:none;">Definir Metas</button>
+    </div>
+    <table id="tabela-usuarios">
+      <thead>
+        <tr>
+          <th>🏆</th>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Sequestros</th>
+          <th>Ações Marcadas</th>
+          <th>Meta</th>
+          <th>Progresso</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Linhas inseridas via JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Painel Gestor -->
+  <div id="painel-gestor" class="painel-box" style="display:none;">
+    <h2>Dashboard do Gestor</h2>
+    <div class="painel-filtros">
+      <label for="filtro-gestor-usuario">Usuário:</label>
+      <select id="filtro-gestor-usuario"><option value="todos">Todos</option></select>
+      <label for="filtro-gestor-mes">Período:</label>
+      <select id="filtro-gestor-mes"><option value="todos">Todos</option></select>
+      <label for="filtro-gestor-tipo">Tipo:</label>
+      <select id="filtro-gestor-tipo">
+        <option value="todos">Todos</option>
+        <option value="sequestro">Sequestro</option>
+        <option value="acao">Ação Marcada</option>
+      </select>
+      <button id="btn-gestor-relatorio" class="painel-btn painel-btn-export">Exportar Relatório</button>
+    </div>
+    <div id="gestor-resultados"></div>
+    <canvas id="grafico-gestor"></canvas>
+  </div>
+
+  <!-- Modal de Metas -->
+  <div id="modal-metas" class="modal-metas" style="display:none;">
+    <div class="modal-metas-content">
+      <h3>Definir Metas por Usuário</h3>
+      <form id="metas-lista"></form>
+      <div class="modal-metas-actions">
+        <button id="btn-salvar-metas" class="painel-btn painel-btn-export" type="button">Salvar Metas</button>
+        <button id="btn-fechar-metas" class="painel-btn form-btn-secondary" type="button">Fechar</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
