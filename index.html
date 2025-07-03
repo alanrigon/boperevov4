@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Controle de Sequestro BOPE</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="app.js"></script>
+
+  <!-- Login/Register/Reset Modal -->
+  <div id="auth-container" class="auth-container">
+    <div id="login-form" class="auth-form">
+      <h2>Login</h2>
+      <input type="email" id="login-email" placeholder="E-mail" required />
+      <input type="password" id="login-password" placeholder="Senha" required />
+      <button id="login-btn">Entrar</button>
+      <p><a href="#" id="show-reset">Esqueci minha senha</a></p>
+      <p>Não tem conta? <a href="#" id="show-register">Registrar-se</a></p>
+    </div>
+    <div id="register-form" class="auth-form" style="display:none;">
+      <h2>Registrar-se</h2>
+      <input type="text" id="register-name" placeholder="Nome completo" required />
+      <input type="email" id="register-email" placeholder="E-mail" required />
+      <input type="password" id="register-password" placeholder="Senha" required />
+      <button id="register-btn">Registrar</button>
+      <p>Já tem conta? <a href="#" id="show-login">Entrar</a></p>
+    </div>
+    <div id="reset-form" class="auth-form" style="display:none;">
+      <h2>Recuperar Senha</h2>
+      <input type="email" id="reset-email" placeholder="E-mail" required />
+      <button id="reset-btn">Enviar link de recuperação</button>
+      <p>Lembrou a senha? <a href="#" id="show-login2">Entrar</a></p>
+    </div>
+  </div>
+  <!-- Fim Auth -->
+
+  <!-- Painel de Aprovação de Usuários (Admin) -->
+  <div id="admin-approval-panel" class="admin-panel" style="display:none;">
+    <h2>Usuários Pendentes</h2>
+    <table id="pending-users-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Data de Cadastro</th>
+          <th>Ações</th>
+          <th>Admin</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Usuários pendentes serão inseridos aqui via JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Tela Inicial Pós-Login -->
+  <div id="main-home" class="main-home" style="display:none;">
+    <div class="home-content">
+      <img src="https://cdn.prod.website-files.com/60ff690cd7b0537edb99a29a/67e1766eaa2556bf2bf03217_BOPE%20RJ.jpg" alt="Painel Ilustrativo" class="home-hero-img" />
+      <h1>Bem-vindo ao Painel</h1>
+      <div class="home-options">
+        <button id="btn-cadastrar-sequestros" class="home-btn">Cadastrar Sequestros</button>
+        <button id="btn-cadastrar-acoes" class="home-btn">Cadastrar Ações Marcadas</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulário de Cadastrar Sequestros -->
+  <div id="form-sequestro" class="form-cadastro" style="display:none;">
+    <h2>Cadastrar Sequestro</h2>
+    <input type="text" id="seq-vitimado" placeholder="Nome da vítima" required />
+    <input type="text" id="seq-local" placeholder="Local do sequestro" required />
+    <input type="datetime-local" id="seq-data" required />
+    <textarea id="seq-detalhes" placeholder="Detalhes" rows="3"></textarea>
+    <div class="form-actions">
+      <button id="btn-salvar-sequestro" class="form-btn">Salvar</button>
+      <button id="btn-voltar-sequestro" class="form-btn form-btn-secondary">Voltar</button>
+    </div>
+  </div>
+
+  <!-- Formulário de Cadastrar Ações Marcadas -->
+  <div id="form-acao" class="form-cadastro" style="display:none;">
+    <h2>Cadastrar Ação Marcada</h2>
+    <input type="text" id="acao-titulo" placeholder="Título da ação" required />
+    <input type="text" id="acao-responsavel" placeholder="Responsável" required />
+    <input type="date" id="acao-data" required />
+    <textarea id="acao-detalhes" placeholder="Detalhes" rows="3"></textarea>
+    <div class="form-actions">
+      <button id="btn-salvar-acao" class="form-btn">Salvar</button>
+      <button id="btn-voltar-acao" class="form-btn form-btn-secondary">Voltar</button>
+    </div>
+  </div>
+</body>
+</html>
